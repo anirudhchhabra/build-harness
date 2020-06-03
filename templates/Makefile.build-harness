@@ -1,0 +1,20 @@
+export SHELL = /bin/bash
+export BUILD_HARNESS_ORG ?= sape-devops-platform
+export BUILD_HARNESS_PROJECT ?= build-harness
+export BUILD_HARNESS_BRANCH ?= develop
+export BUILD_HARNESS_PATH ?= $(shell until [ -d "$(BUILD_HARNESS_PROJECT)" ] || [ "`pwd`" == '/' ]; do cd ..; done; pwd)/$(BUILD_HARNESS_PROJECT)
+-include $(BUILD_HARNESS_PATH)/Makefile
+
+.PHONY : init
+## Init build-harness
+init::
+	@curl --retry 5 --retry-delay 1 https://pscode.lioncloud.net/api/v4/projects/16428/repository/files/bin%2Finstall.sh/raw?ref=develop --header 'Private-Token: rJ__zX-FzGjf9cxAzDBe' | \
+		bash -s "$(BUILD_HARNESS_ORG)" "$(BUILD_HARNESS_PROJECT)" "$(BUILD_HARNESS_BRANCH)"
+	echo "call to install.sh file finished..." 
+
+.PHONY : clean
+## Clean build-harness
+clean::
+	@[ "$(BUILD_HARNESS_PATH)" == '/' ] || \
+	 [ "$(BUILD_HARNESS_PATH)" == '.' ] || \
+	   echo rm -rf $(BUILD_HARNESS_PATH)
